@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class AutoVerticalSlider2D : MonoBehaviour
 {
@@ -10,13 +9,12 @@ public class AutoVerticalSlider2D : MonoBehaviour
     private bool isMoving;
     private float startY;
     private float direction = 1f;
-    public Transform tr;
+
     void OnEnable()
     {
         startY = transform.position.y;
         isMoving = false;
         direction = 1f;
-       
     }
 
     void Update()
@@ -31,12 +29,14 @@ public class AutoVerticalSlider2D : MonoBehaviour
 
     void HandleInput()
     {
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        // Нажали кнопку
+        if (Input.GetMouseButtonDown(0))
         {
             isMoving = true;
         }
 
-        if (Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame)
+        // Отпустили кнопку
+        if (Input.GetMouseButtonUp(0))
         {
             isMoving = false;
         }
