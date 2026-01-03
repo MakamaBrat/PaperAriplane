@@ -4,68 +4,42 @@ using UnityEngine.UI;
 public class SettingsSwitcher : MonoBehaviour
 {
     [Header("Audio")]
-    public AudioSource musicSource;
     public AudioSource[] sfxSources;
 
-    [Header("UI Images")]
-    public Image musicImage;
+    [Header("UI Image")]
     public Image sfxImage;
-    public Image dummyImage; // третья настройка
 
-    [Header("Sprites")]
-    public Sprite onSprite;
-    public Sprite offSprite;
 
-    [Header("States")]
-    public bool musicOn = true;
-    public bool sfxOn = true;
-    public bool dummyOn = true; // третья настройка
+    [Header("Transparency")]
+    [Range(0f, 1f)] public float offAlpha = 0.5f;
+    [Range(0f, 1f)] public float onAlpha = 1f;
 
-    [Header("Transparency Settings")]
-    [Range(0f, 1f)] public float offAlpha = 0.5f; // прозрачность, когда выключено
-    [Range(0f, 1f)] public float onAlpha = 1f;    // прозрачность, когда включено
+    private bool sfxOn = true;
 
-    private void Start()
+    private const string SFX_KEY = "SFX_ON";
+
+    void Start()
     {
-        ApplyMusicState();
+        // 🔹 загружаем сохранённое состояние
+        sfxOn = PlayerPrefs.GetInt(SFX_KEY, 1) == 1;
         ApplySfxState();
-        ApplyDummyState();
     }
 
     // --------------------
-    // SWITCHERS
+    // SWITCH
     // --------------------
-
-    public void SwitchMusic()
-    {
-        musicOn = !musicOn;
-        ApplyMusicState();
-    }
-
     public void SwitchSfx()
     {
         sfxOn = !sfxOn;
+        PlayerPrefs.SetInt(SFX_KEY, sfxOn ? 1 : 0);
+        PlayerPrefs.Save();
+
         ApplySfxState();
     }
 
-    public void SwitchDummy()
-    {
-        dummyOn = !dummyOn;
-        ApplyDummyState();
-    }
-
     // --------------------
-    // APPLY STATES
+    // APPLY
     // --------------------
-
-    void ApplyMusicState()
-    {
-        if (musicSource != null)
-            musicSource.mute = !musicOn;
-
-        ApplyImageState(musicImage, musicOn);
-    }
-
     void ApplySfxState()
     {
         foreach (AudioSource sfx in sfxSources)
@@ -77,13 +51,8 @@ public class SettingsSwitcher : MonoBehaviour
         ApplyImageState(sfxImage, sfxOn);
     }
 
-    void ApplyDummyState()
-    {
-        ApplyImageState(dummyImage, dummyOn);
-    }
-
     // --------------------
-    // HELPER
+    // UI HELPER
     // --------------------
     void ApplyImageState(Image img, bool state)
     {
@@ -94,11 +63,6 @@ public class SettingsSwitcher : MonoBehaviour
         c.a = state ? onAlpha : offAlpha;
         img.color = c;
 
-        // спрайт
-        if (onSprite != null && offSprite != null)
-        {
-            img.sprite = state ? onSprite : offSprite;
-            img.SetNativeSize();
-        }
+        
     }
 }
