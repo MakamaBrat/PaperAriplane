@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class GameFlowController : MonoBehaviour
 {
@@ -13,6 +12,7 @@ public class GameFlowController : MonoBehaviour
     public Transform plane2;
     public Transform explo;
     public Transform weapon;
+
     [Header("Slider")]
     public Transform slider;
     public float sliderSpeed = 3f;
@@ -36,28 +36,30 @@ public class GameFlowController : MonoBehaviour
 
     void Awake()
     {
-        // ✅ сохраняем исходную позицию ОДИН раз
+        // сохраняем исходную позицию ОДИН раз
         startY = slider.position.y;
     }
 
     void OnEnable()
     {
-        // 🔁 ЖЁСТКИЙ РЕСЕТ
+        // жёсткий ресет
         Vector3 pos = slider.position;
         pos.y = startY;
         slider.position = pos;
+
         plane.gameObject.SetActive(false);
         plane2.gameObject.SetActive(false);
         direction = 1f;
         sliderMoving = true;
         timerRunning = false;
         timer = 0f;
+
         explo.gameObject.SetActive(false);
         weapon.gameObject.SetActive(true);
         distance.gameObject.SetActive(false);
+
         backgroundAnimator.Play("BackgroundState");
         spawner.gameObject.SetActive(false);
-     
     }
 
     void Update()
@@ -72,14 +74,15 @@ public class GameFlowController : MonoBehaviour
     }
 
     // --------------------
-    // INPUT
+    // INPUT (OLD INPUT)
     // --------------------
     void HandleInput()
     {
         if (timerRunning)
             return;
 
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        // ЛКМ или ТАП
+        if (Input.GetMouseButtonDown(0))
         {
             OnClick();
         }
@@ -96,12 +99,15 @@ public class GameFlowController : MonoBehaviour
     {
         StopAllCoroutines();
         StartCoroutine(make2());
+
         sliderMoving = false;
+
         plane.gameObject.SetActive(true);
         explo.gameObject.SetActive(true);
         weapon.gameObject.SetActive(true);
         distance.gameObject.SetActive(true);
         spawner.gameObject.SetActive(true);
+
         float normalized = Mathf.InverseLerp(
             startY - amplitude,
             startY + amplitude,
@@ -109,9 +115,11 @@ public class GameFlowController : MonoBehaviour
         );
 
         timerDuration = Mathf.Lerp(minTime, maxTime, normalized);
-        plane2.transform.position=sp.transform.position;
+
+        plane2.transform.position = sp.transform.position;
         backgroundAnimator.Play("BackgroundMove");
         weapon.gameObject.SetActive(false);
+
         timerRunning = true;
         timer = 0f;
     }
